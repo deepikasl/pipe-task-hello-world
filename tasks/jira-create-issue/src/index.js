@@ -5,7 +5,7 @@ async function main() {
   let endpoint = tasks.getInput("endpoint");
   const summary = tasks.getInput("summary");
   const projectKey = tasks.getInput("projectKey");
-  const issueTypeId = tasks.getInput("issueTypeId");
+  const issueType = tasks.getInput("issueType");
   const description = tasks.getInput("description");
   const username = tasks.getInput("username");
   const token = tasks.getInput("token");
@@ -30,7 +30,7 @@ async function main() {
           key: projectKey,
         },
         issuetype: {
-          id: issueTypeId,
+          name: issueType,
         },
         description,
       },
