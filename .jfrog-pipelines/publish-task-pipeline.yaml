@@ -209,6 +209,6 @@ pipelines:
                 summary: "Ticket from Run# $run_number"
                 description: "Hi from run number $run_number, from step: $step_url"
                 projectKey: "TAS"
-                issueTypeId: "10000"
+                issueTypeId: "10002"
                 username: "$int_deepikajira_username"
                 token: "$int_deepikajira_token"
