@@ -9,6 +9,10 @@ async function main() {
   const description = tasks.getInput("description");
   const username = tasks.getInput("username");
   const token = tasks.getInput("token");
+  const apiSuffix = "/rest/api/2";
+
+  endpoint = endpoint.replace(/^\/|\/$/g, ''); // removes trailing slash
+  endpoint = endpoint.replace(apiSuffix, '');
 
   const options = {
     method: "POST",
