@@ -1,0 +1,22 @@
+name: jira-create-issue
+description: Creates a new Jira ticket
+source: github.com/abhishekk/pipe-task-hello-world
+labels:
+  - jira
+  - create
+  - issue
+input:
+  - name: summary
+    description: Summary of the ticket you want to add
+  - name: projectKey
+    description: Key of the project under which the ticket should be created
+  - name: issueTypeId
+    description: Id of the issueType
+  - name: description
+    description: Description of the issue you want to add
+  - name: username
+    description: username of the jira
+  - name: token
+    description: token
+execution:
+  - node16 src/index.js
