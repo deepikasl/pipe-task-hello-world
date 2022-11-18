@@ -1,5 +1,5 @@
-repoPath: PIP/pipe-task-hello-world
+repoPath: deepikasl/pipe-task-hello-world
 mainBranch: main
-gitIntegration: int_github
-artIntegration: int_artifactory
+gitIntegration: deepikaGithub
+artIntegration: int_default_artifactory
 windowsNodePool:

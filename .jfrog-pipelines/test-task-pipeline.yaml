@@ -59,52 +59,34 @@ pipelines:
           onComplete:
             - echo "Step done!"
 
-{{ if .Values.windowsNodePool }}
-  - name: hello_world_task_win_test
+  - name: jira_comment_task
     configuration:
+      environmentVariables:
+        readOnly:
+          ISSUE_KEY: TAS-1
       jfrogCliVersion: 2
-      nodePool: {{ .Values.windowsNodePool }}
       runtime:
         type: image
         image:
           custom:
-            name: releases-docker.jfrog.io/jfrog/pipelines-w19node
+            name: releases-docker.jfrog.io/jfrog/pipelines-u18node
             tag: "16"
             autoPull: true
-      environmentVariables:
-        readOnly:
-          RESOLVE_REPO: npm-virtual
     steps:
-      - name: win_test_task
-        type: PowerShell
+      - name: jira_comment_task
+        type: Bash
         configuration:
-          inputResources:
-            - name: hello_world_task_gitrepo
           integrations:
             - name: {{ .Values.artIntegration }}
+            - name: deepikajira
         execution:
           onExecute:
-            - pushd $res_hello_world_task_gitrepo_resourcePath
-            # Configure JFrog CLI
-            - jfrog npmc --repo-resolve $RESOLVE_REPO
-            # Install npm dependencies
-            - jfrog npm install
-            # Build task runnable script bundled with dependencies
-            - npm run dist
-            - popd
-
-            # Run task
-            - task: $res_hello_world_task_gitrepo_resourcePath
-              id: hello_world_test
+            - fail this step
+          onFailure:
+            - task: jira-comment@v0.0.13
               input:
-                name: "developer"
-
-            # Check task output
-            - echo "task output is ${OUT_hello_world_test_greeting}"
-            # Check exported environment variable
-            - echo "path to greeting file is ${GREETING_FILE}"
-            # Check task generated file
-            - Get-Content ./greeting.txt
-          onComplete:
-            - echo "Step done!"
-{{ end }}
+                issue_key: "$ISSUE_KEY"
+                username: "$int_deepikajira_username"
+                token: "$int_deepikajira_token"
+                endpoint: "$int_deepikajira_url"
+                comment: "You have a failed run: $run_number, from step: $step_url"
