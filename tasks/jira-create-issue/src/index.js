@@ -2,6 +2,7 @@ const tasks = require("jfrog-pipelines-tasks");
 const axios = require("axios");
 
 async function main() {
+  let endpoint = tasks.getInput("endpoint");
   const summary = tasks.getInput("summary");
   const projectKey = tasks.getInput("projectKey");
   const issueTypeId = tasks.getInput("issueTypeId");
