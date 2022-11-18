@@ -146,3 +146,69 @@ pipelines:
                 token: "$int_deepikajira_token"
                 endpoint: "$int_deepikajira_url"
                 comment: "Hi from run number $run_number, from step: $step_url"
+  - name: jira_create_issue_task_publish
+    configuration:
+      jfrogCliVersion: 2
+      runtime:
+        type: image
+        image:
+          custom:
+            name: releases-docker.jfrog.io/jfrog/pipelines-u18node
+            tag: "16"
+            autoPull: true
+      environmentVariables:
+        readOnly:
+          TASK_NAME: jira-create-issue
+          TASK_VERSION: 0.0.${run_number}
+          TASK_REPOSITORY: pipelines-tasks-local
+          RESOLVE_REPO: npm-virtual
+          JIRA_INT: deepikajira
+    steps:
+      - name: build_and_publish_task
+        type: Bash
+        configuration:
+          inputResources:
+            - name: hello_world_task_publish_gitrepo
+              trigger: false
+          integrations:
+            - name: {{ .Values.artIntegration }}
+        execution:
+          onExecute:
+            - pushd $res_hello_world_task_publish_gitrepo_resourcePath/tasks/$TASK_NAME/src
+            - jfrog npmc --repo-resolve $RESOLVE_REPO
+            - jfrog npm install
+            - npm run dist
+            - popd
+            - mkdir $JFROG_STEP_WORKSPACE_DIR/$TASK_NAME
+            - cp -rf $res_hello_world_task_publish_gitrepo_resourcePath/tasks/$TASK_NAME/* $JFROG_STEP_WORKSPACE_DIR/$TASK_NAME
+            - echo "Task content" && ls -la $JFROG_STEP_WORKSPACE_DIR/$TASK_NAME
+            - task: jfrog/publish-task@v0.0.1
+              id: publish-hello-world
+              input:
+                path: $JFROG_STEP_WORKSPACE_DIR/$TASK_NAME
+                rtRepository: $TASK_REPOSITORY
+                taskName: $TASK_NAME
+                version: $TASK_VERSION
+
+      - name: test_published_task
+        type: Bash
+        configuration:
+          inputSteps:
+            - name: build_and_publish_task
+          integrations:
+            - name: {{ .Values.artIntegration }}
+            - name: deepikajira
+        execution:
+          onExecute:
+            # Run task
+            - echo "Do something"
+            - echo "$int_$JIRA_INT_username"
+            - task: $TASK_NAME@v$TASK_VERSION
+              input:
+                endpoint: "$int_deepikajira_url"
+                summary: "Ticket from Run# $run_number"
+                description: "Hi from run number $run_number, from step: $step_url"
+                projectKey: "TAS"
+                issueTypeId: "10000"
+                username: "$int_deepikajira_username"
+                token: "$int_deepikajira_token"
