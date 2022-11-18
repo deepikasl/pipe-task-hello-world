@@ -10,8 +10,8 @@ input:
     description: Summary of the ticket you want to add
   - name: projectKey
     description: Key of the project under which the ticket should be created
-  - name: issueTypeId
-    description: Id of the issueType
+  - name: issueType
+    description: Type of the issue you want to add e.g. Task
   - name: description
     description: Description of the issue you want to add
   - name: username
